@@ -3,6 +3,11 @@ import Image from "next/image";
 import Head from "next/head";
 import Navbar from "../../components/Navbar";
 import { Hero } from "../../components/Hero";
+import Footer  from '../../components/Footer'
+import FeaturedSection  from '../../components/FeaturedSection'
+import AboutUsSection  from '../../components/AboutUsSection'
+
+
 
 export default function Home() {
   return (
@@ -21,7 +26,10 @@ export default function Home() {
     <main className="flex-grow">
       
       <Hero/>
-      <Hero />
+      <FeaturedSection />
+      <AboutUsSection />
+      <Footer />
+      
     </main>
   </div>
   );
