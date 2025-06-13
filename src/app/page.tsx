@@ -28,7 +28,7 @@ export default function Home() {
       <Hero/>
       <FeaturedSection />
       <AboutUsSection />
-      <Footer />
+      
       
     </main>
   </div>

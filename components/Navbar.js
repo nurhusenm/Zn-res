@@ -133,7 +133,7 @@ const Navbar = () => {
     className={`fixed w-full top-0 z-50 transition-all duration-300 ease-in-out h-[90px] ${
       scrolled
         ? "py-2 bg-[#e8e0d5] shadow-lg text-[#452614]"
-        : "py-4 bg-transparent text-white/90"
+        : "py-4 bg-transparent text-[#5e3521]"
     }`}
   >
     <div className="container mx-auto flex justify-between items-center px-4">

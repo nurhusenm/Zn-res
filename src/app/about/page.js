@@ -1,8 +1,6 @@
 // app/about/page.js
 "use client";
 
-import Navbar from "../../../components/Navbar";
-import Footer from "../../../components/Footer";
 import Button from "../../../components/ui/Button";
 import { motion } from "framer-motion";
 import Image from "next/image";
@@ -24,7 +22,7 @@ export default function AboutPage() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Navbar />
+      
       <main className="flex-grow">
         {/* Hero Section */}
         <section className="relative h-[60vh] overflow-hidden">
@@ -148,7 +146,7 @@ export default function AboutPage() {
           </div>
         </section>
       </main>
-      <Footer />
+      
     </div>
   );
 }
