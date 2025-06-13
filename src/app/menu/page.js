@@ -292,7 +292,7 @@ export default function MenuPage() {
 
   const [brokenImages, setBrokenImages] = useState({});
 
-  // Handler when an <img> fails to load
+  
   const onImageError = (idx) => {
     setBrokenImages((prev) => ({ ...prev, [idx]: true }));
   };
@@ -365,4 +365,3 @@ export default function MenuPage() {
   );
 }
 
-// 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
