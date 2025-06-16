@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { updateMenuItem, deleteMenuItem } from '@/lib/db/schema';
+import { updateMenuItem, deleteMenuItem } from '../../../../../lib/db/schema';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../../auth/[...nextauth]/route';
 

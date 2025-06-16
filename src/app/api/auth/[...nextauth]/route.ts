@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import type { AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { getUserByEmail, verifyPassword } from "@/lib/db/schema";
+import { getUserByEmail, verifyPassword } from"../../../../../lib/db/schema";
 
 export const authOptions: AuthOptions = {
   providers: [

@@ -16,7 +16,7 @@ import {
   Upload
 } from 'lucide-react';
 import Link from 'next/link';
-import { getMenuItems, deleteMenuItem } from '@/lib/db/schema';
+import { getMenuItems, deleteMenuItem } from '../../../../lib/db/schema';
 import Image from 'next/image';
 import ClientBody from "../../../components/ClientBody";
 
