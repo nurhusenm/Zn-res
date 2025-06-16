@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { getMenuItem, createMenuItem, updateMenuItem } from '@/lib/db/schema';
+import { getMenuItem, createMenuItem, updateMenuItem } from '../../../../../lib/db/schema';
 
 interface MenuItem {
   id: number;
