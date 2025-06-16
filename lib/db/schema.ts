@@ -19,7 +19,7 @@ let db: Database.Database | null = null;
 if (typeof window === 'undefined') {
   db = new Database('sqlite.db');
 
-  // Create tables if they don't exist
+  // Create tables if they don't 
   db.exec(`
     CREATE TABLE IF NOT EXISTS menu_items (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
