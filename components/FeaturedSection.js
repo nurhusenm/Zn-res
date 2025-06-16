@@ -60,6 +60,7 @@ const FeaturedSection = () => {
               </span>
             </button>
           </motion.div>
+          
         </motion.div>
       </div>
     </section>
