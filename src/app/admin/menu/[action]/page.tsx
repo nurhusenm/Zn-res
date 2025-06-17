@@ -1,16 +1,11 @@
 // src/app/admin/menu/[action]/page.tsx
 
 import MenuItemFormClient from './MenuItemFormClient';
-import { FC } from 'react';
 
-interface PageProps {
-  params: {
-    action: string;
-  };
-}
-
-const MenuItemPage: FC<PageProps> = ({ params }) => {
+export default function MenuItemPage({
+  params,
+}: {
+  params: { action: string };
+}) {
   return <MenuItemFormClient params={params} />;
-};
-
-export default MenuItemPage;
+}
