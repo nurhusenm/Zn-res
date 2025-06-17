@@ -16,7 +16,7 @@ interface User {
   updated_at: Date;
 }
 
-const dbName = 'zara-restuarant';
+const dbName = 'xara-restuarant';
 
 export async function getMenuItems(): Promise<MenuItem[]> {
   const client = await clientPromise;
