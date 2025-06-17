@@ -17,17 +17,9 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { getMenuItems, deleteMenuItem } from '../../../../lib/db/schema';
+import { MenuItem } from '../../../../types/menu';
 import Image from 'next/image';
 import ClientBody from "../../../components/ClientBody";
-
-interface MenuItem {
-  id: number;
-  food_name: string;
-  price: number;
-  ingredients: string;
-  related_image: string;
-  created_at: string;
-}
 
 export default function AdminDashboard() {
   const { data: session, status } = useSession();
@@ -62,7 +54,7 @@ export default function AdminDashboard() {
   const fetchMenuItems = async () => {
     try {
       setIsLoading(true);
-      const items = await getMenuItems() as MenuItem[];
+      const items = await getMenuItems();
       setMenuItems(items);
 
       // Calculate statistics
@@ -88,7 +80,7 @@ export default function AdminDashboard() {
     setIsEditing(true);
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this item?')) return;
 
     try {
@@ -106,7 +98,7 @@ export default function AdminDashboard() {
     if (!editingItem) return;
 
     try {
-      const response = await fetch(`/api/menu/${editingItem.id}`, {
+      const response = await fetch(`/api/menu/${editingItem._id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editingItem),
@@ -268,7 +260,7 @@ export default function AdminDashboard() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {menuItems.map((item) => (
               <motion.div
-                key={item.id}
+                key={item._id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="bg-white rounded-lg shadow-md overflow-hidden relative z-0"
@@ -301,7 +293,7 @@ export default function AdminDashboard() {
                       Edit
                     </button>
                     <button
-                      onClick={() => handleDelete(item.id)}
+                      onClick={() => handleDelete(item._id)}
                       className="flex-1 bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 transition-colors flex items-center justify-center gap-1"
                     >
                       <Trash2 className="w-4 h-4" />

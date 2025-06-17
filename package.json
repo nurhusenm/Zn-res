@@ -9,16 +9,21 @@
     "start": "next start",
     "lint": "next lint",
     "init-db": "NODE_OPTIONS='--loader ts-node/esm' ts-node --esm scripts/init-db.ts",
-    "init-menu": "NODE_OPTIONS='--loader ts-node/esm' ts-node --esm scripts/init-menu.ts"
+    "init-menu": "NODE_OPTIONS='--loader ts-node/esm' ts-node --esm scripts/init-menu.ts",
+    "test-mongodb": "NODE_OPTIONS='--loader ts-node/esm' ts-node --esm scripts/test-mongodb.ts",
+    "test-mongodb-direct": "NODE_OPTIONS='--loader ts-node/esm' ts-node --esm scripts/test-mongodb-direct.ts",
+    "deploy-test": "NODE_OPTIONS='--loader ts-node/esm' ts-node --esm scripts/deploy-test.ts"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.3",
     "@types/better-sqlite3": "^7.6.13",
     "better-sqlite3": "^11.10.0",
     "class-variance-authority": "^0.7.1",
+    "dotenv": "^16.5.0",
     "framer-motion": "^12.17.3",
     "kysely": "^0.28.2",
     "lucide-react": "^0.514.0",
+    "mongodb": "^6.17.0",
     "next": "^15.3.3",
     "next-auth": "^4.24.11",
     "react": "^19.0.0",

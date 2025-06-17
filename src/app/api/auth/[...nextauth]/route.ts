@@ -28,7 +28,7 @@ const authOptions: AuthOptions = {
         }
 
         return {
-          id: user.id.toString(),
+          id: user._id.toString(),
           email: user.email,
           name: user.name,
           role: user.role

@@ -1,133 +1,98 @@
+// lib/db/schema.ts
 'use server';
 
-import Database from 'better-sqlite3';
+import clientPromise from '../mongodb';
 import bcrypt from 'bcryptjs';
+import { ObjectId } from 'mongodb';
+import { MenuItem, MenuItemInput } from '../../types/menu';
 
 interface User {
-  id: number;
+  _id: string;
   email: string;
   password: string;
   name: string;
   role: 'admin' | 'user';
-  created_at: string;
-  updated_at: string;
+  created_at: Date;
+  updated_at: Date;
 }
 
-// Initialize SQLite database only on the server side
-let db: Database.Database | null = null;
+const dbName = 'zara-restuarant';
 
-if (typeof window === 'undefined') {
-  db = new Database('sqlite.db');
-
-  // Create tables if they don't 
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS menu_items (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      food_name TEXT NOT NULL,
-      price REAL NOT NULL,
-      ingredients TEXT NOT NULL,
-      related_image TEXT NOT NULL,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
-
-    CREATE TABLE IF NOT EXISTS users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      email TEXT NOT NULL UNIQUE,
-      password TEXT NOT NULL,
-      name TEXT NOT NULL,
-      role TEXT NOT NULL DEFAULT 'user',
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
-  `);
+export async function getMenuItems(): Promise<MenuItem[]> {
+  const client = await clientPromise;
+  const coll = client.db(dbName).collection('menu_items');
+  const items = await coll.find().sort({ created_at: -1 }).toArray();
+  return items as unknown as MenuItem[];
 }
 
-// Menu items
-export async function getMenuItems() {
-  if (!db) throw new Error('Database not initialized');
-  return db.prepare('SELECT * FROM menu_items ORDER BY created_at DESC').all();
+export async function getMenuItem(id: string): Promise<MenuItem | null> {
+  const client = await clientPromise;
+  const coll = client.db(dbName).collection('menu_items');
+  const item = await coll.findOne({ _id: new ObjectId(id) });
+  return item as unknown as MenuItem | null;
 }
 
-export async function getMenuItem(id: number) {
-  if (!db) throw new Error('Database not initialized');
-  return db.prepare('SELECT * FROM menu_items WHERE id = ?').get(id);
+export async function createMenuItem(item: MenuItemInput): Promise<MenuItem> {
+  const client = await clientPromise;
+  const coll = client.db(dbName).collection('menu_items');
+  const now = new Date();
+  const res = await coll.insertOne({ ...item, created_at: now, updated_at: now });
+  return { _id: res.insertedId.toString(), ...item, created_at: now, updated_at: now };
 }
 
-export async function createMenuItem(item: {
-  food_name: string;
-  price: number;
-  ingredients: string;
-  related_image: string;
-}) {
-  if (!db) throw new Error('Database not initialized');
-  const stmt = db.prepare(`
-    INSERT INTO menu_items (food_name, price, ingredients, related_image)
-    VALUES (?, ?, ?, ?)
-  `);
-  return stmt.run(item.food_name, item.price, item.ingredients, item.related_image);
+export async function updateMenuItem(id: string, updates: Partial<MenuItemInput>): Promise<MenuItem | null> {
+  const client = await clientPromise;
+  const coll = client.db(dbName).collection('menu_items');
+  const now = new Date();
+  const res = await coll.findOneAndUpdate(
+    { _id: new ObjectId(id) },
+    { $set: { ...updates, updated_at: now } },
+    { returnDocument: 'after' }
+  );
+  return res?.value as unknown as MenuItem | null;
 }
 
-export async function updateMenuItem(id: number, item: {
-  food_name?: string;
-  price?: number;
-  ingredients?: string;
-  related_image?: string;
-}) {
-  if (!db) throw new Error('Database not initialized');
-  const updates = Object.entries(item)
-    .filter(([_, value]) => value !== undefined)
-    .map(([key]) => `${key} = ?`)
-    .join(', ');
-  
-  if (!updates) return null;
-  
-  const stmt = db.prepare(`
-    UPDATE menu_items 
-    SET ${updates}, updated_at = CURRENT_TIMESTAMP
-    WHERE id = ?
-  `);
-  
-  return stmt.run(...Object.values(item).filter(v => v !== undefined), id);
+export async function deleteMenuItem(id: string): Promise<{ success: boolean }> {
+  const client = await clientPromise;
+  const coll = client.db(dbName).collection('menu_items');
+  await coll.deleteOne({ _id: new ObjectId(id) });
+  return { success: true };
 }
 
-export async function deleteMenuItem(id: number) {
-  if (!db) throw new Error('Database not initialized');
-  return db.prepare('DELETE FROM menu_items WHERE id = ?').run(id);
-}
+// -- USERS --
 
-// Users
 export async function createUser(user: {
   email: string;
   password: string;
   name: string;
   role?: 'admin' | 'user';
-}) {
-  if (!db) throw new Error('Database not initialized');
-  const hashedPassword = await bcrypt.hash(user.password, 10);
-  const stmt = db.prepare(`
-    INSERT INTO users (email, password, name, role)
-    VALUES (?, ?, ?, ?)
-  `);
-  return stmt.run(user.email, hashedPassword, user.name, user.role || 'user');
+}): Promise<User> {
+  const client = await clientPromise;
+  const coll = client.db(dbName).collection('users');
+  const hashed = await bcrypt.hash(user.password, 10);
+  const now = new Date();
+  const role = user.role || 'user';
+  const res = await coll.insertOne({
+    email: user.email,
+    password: hashed,
+    name: user.name,
+    role,
+    created_at: now,
+    updated_at: now,
+  });
+  return { _id: res.insertedId.toString(), email: user.email, password: hashed, name: user.name, role, created_at: now, updated_at: now };
 }
 
-export async function getUserByEmail(email: string): Promise<User | undefined> {
-  if (!db) throw new Error('Database not initialized');
-  return db.prepare('SELECT * FROM users WHERE email = ?').get(email) as User | undefined;
+export async function getUserByEmail(email: string): Promise<User | null> {
+  const client = await clientPromise;
+  const coll = client.db(dbName).collection('users');
+  const user = await coll.findOne({ email });
+  return user as unknown as User | null;
 }
 
 export async function verifyPassword(email: string, password: string): Promise<User | null> {
-  if (!db) throw new Error('Database not initialized');
-  console.log('Verifying password for email:', email);
-  
   const user = await getUserByEmail(email);
-  console.log('User found in database:', user ? 'Yes' : 'No');
-  
   if (!user) return null;
-  
-  const isValid = await bcrypt.compare(password, user.password);
-  console.log('Password valid:', isValid);
-  
-  return isValid ? user : null;
-} 
+  const ok = await bcrypt.compare(password, user.password);
+  return ok ? user : null;
+}

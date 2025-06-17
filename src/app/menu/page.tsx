@@ -5,21 +5,14 @@ import { motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import Image from 'next/image';
 import Link from 'next/link';
-
-interface MenuItem {
-  id: number;
-  food_name: string;
-  price: number;
-  ingredients: string;
-  related_image: string;
-}
+import { MenuItem } from '../../../types/menu';
 
 const DEFAULT_IMAGE = '/images/default-food.jpg';
 
 export default function MenuPage() {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({});
+  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     const fetchMenuItems = async () => {
@@ -39,7 +32,7 @@ export default function MenuPage() {
     fetchMenuItems();
   }, []);
 
-  const handleImageError = (itemId: number) => {
+  const handleImageError = (itemId: string) => {
     setImageErrors(prev => ({ ...prev, [itemId]: true }));
   };
 
@@ -70,7 +63,7 @@ export default function MenuPage() {
       >
         {menuItems.map((item, index) => (
           <motion.div
-            key={item.id}
+            key={item._id}
             variants={{
               hidden: { opacity: 0, y: 20 },
               visible: { opacity: 1, y: 0 },
@@ -78,13 +71,13 @@ export default function MenuPage() {
             className="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col"
           >
             <div className="h-48 overflow-hidden relative">
-              {!imageErrors[item.id] ? (
+              {!imageErrors[item._id] ? (
                 <Image
                   src={item.related_image}
                   alt={item.food_name}
                   fill
                   className="object-cover"
-                  onError={() => handleImageError(item.id)}
+                  onError={() => handleImageError(item._id)}
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   priority={index < 6}
                 />

@@ -9,14 +9,20 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // 1. Check for admin user
     const session = await getServerSession(authOptions);
     if (!session || session.user.role !== 'admin') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // 2. Await the params
     const { id } = await params;
+
+    // 3. Get update data from request body
     const data = await request.json();
-    const result = await updateMenuItem(parseInt(id), data);
+
+    // 4. Call the updated MongoDB function
+    const result = await updateMenuItem(id, data);
 
     if (!result) {
       return NextResponse.json({ error: 'Menu item not found' }, { status: 404 });
@@ -34,13 +40,17 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // 1. Check for admin user
     const session = await getServerSession(authOptions);
     if (!session || session.user.role !== 'admin') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // 2. Await the params
     const { id } = await params;
-    const result = await deleteMenuItem(parseInt(id));
+
+    // 3. Call the updated MongoDB function
+    const result = await deleteMenuItem(id);
 
     if (!result) {
       return NextResponse.json({ error: 'Menu item not found' }, { status: 404 });
