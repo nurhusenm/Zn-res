@@ -12,7 +12,8 @@
     "init-menu": "NODE_OPTIONS='--loader ts-node/esm' ts-node --esm scripts/init-menu.ts",
     "test-mongodb": "NODE_OPTIONS='--loader ts-node/esm' ts-node --esm scripts/test-mongodb.ts",
     "test-mongodb-direct": "NODE_OPTIONS='--loader ts-node/esm' ts-node --esm scripts/test-mongodb-direct.ts",
-    "deploy-test": "NODE_OPTIONS='--loader ts-node/esm' ts-node --esm scripts/deploy-test.ts"
+    "deploy-test": "NODE_OPTIONS='--loader ts-node/esm' ts-node --esm scripts/deploy-test.ts",
+    "create-admin": "NODE_OPTIONS='--loader ts-node/esm' ts-node --esm scripts/create-admin.ts"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.3",
