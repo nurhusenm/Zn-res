@@ -129,8 +129,9 @@ export default function AboutPage() {
 
             
 <motion.div whileHover={{ scale: 1.05 }}>
+  <Link href="/menu">
             <button
-              onClick={() => scrollToSection("menu")}
+              // onClick={() => scrollToSection("menu")}
               className="relative px-6 py-3 rounded-lg 
                          bg-gradient-to-r from-[#b5633e] to-[#b8805a] overflow-hidden group"
             >
@@ -142,6 +143,8 @@ export default function AboutPage() {
                 Explore Menu
               </span>
             </button>
+  </Link>
+
           </motion.div>
           </div>
         </section>

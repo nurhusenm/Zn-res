@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { Button } from "./ui/customBtn";
 import { useState, useEffect } from "react";
+import Link from "next/link";
 
 export function Hero() {
   const videos = ["/videos/video.mp4", "/videos/video4.mp4", "/videos/video3.mp4"];
@@ -85,6 +86,7 @@ export function Hero() {
           transition={{ duration: 0.8, delay: 1.1 }}
           className="mt-6 flex flex-row  gap-4"
         >
+          <Link href="/about">
           <Button
             onClick={() => scrollToSection("about-us")}
             size="lg"
@@ -93,10 +95,13 @@ export function Hero() {
           >
             Our Story
           </Button>
+          </Link>
+
 
           <motion.div whileHover={{ scale: 1.05 }}>
+            <Link href="/menu" >
             <button
-              onClick={() => scrollToSection("menu")}
+              // onClick={() => scrollToSection("menu")}
               className="relative px-6 py-3 rounded-lg 
                          bg-gradient-to-r from-[#b5633e] to-[#b8805a] overflow-hidden group"
             >
@@ -108,6 +113,8 @@ export function Hero() {
                 View Menu
               </span>
             </button>
+            </Link>
+
           </motion.div>
 
         </motion.div>

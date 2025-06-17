@@ -3,6 +3,7 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
+import Link from "next/link";
 // import  {Button}  from "./ui/customBtn";
 
 const FeaturedSection = () => {
@@ -46,6 +47,7 @@ const FeaturedSection = () => {
          
 
 <motion.div whileHover={{ scale: 1.05 }}>
+  <Link href="/menu">
             <button
               onClick={() => scrollToSection("menu")}
               className="relative px-6 py-3 rounded-lg 
@@ -59,6 +61,8 @@ const FeaturedSection = () => {
                 Explore Menu
               </span>
             </button>
+  </Link>
+
           </motion.div>
           
         </motion.div>
