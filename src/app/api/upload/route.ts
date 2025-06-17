@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
-import { writeFile } from 'fs/promises';
+import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
+import { existsSync } from 'fs';
 
 export async function POST(request: Request) {
   try {
@@ -14,6 +15,14 @@ export async function POST(request: Request) {
       );
     }
 
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      return NextResponse.json(
+        { error: 'Only image files are allowed' },
+        { status: 400 }
+      );
+    }
+
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
@@ -21,10 +30,13 @@ export async function POST(request: Request) {
     const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
     const filename = `${uniqueSuffix}-${file.name}`;
     
-    // Save to public directory
+    // Ensure uploads directory exists
     const publicDir = join(process.cwd(), 'public', 'uploads');
-    const path = join(publicDir, filename);
+    if (!existsSync(publicDir)) {
+      await mkdir(publicDir, { recursive: true });
+    }
     
+    const path = join(publicDir, filename);
     await writeFile(path, buffer);
     
     // Return the URL path

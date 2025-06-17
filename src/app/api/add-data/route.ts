@@ -34,6 +34,24 @@ export async function GET() {
         price: 16.99,
         ingredients: "Eggs, Veggies",
         related_image: "/images/menu/kikil.jpeg"
+      },
+      {
+        food_name: "Zilzil Shekla",
+        price: 19.99,
+        ingredients: "Onion, Tomatoes, Jalapenos, Garlic, Clarified butter, Mild, hot, and non-spicy stew",
+        related_image: "/images/menu/zilzil.jpg"
+      },
+      {
+        food_name: "Hamli Siga",
+        price: 18.99,
+        ingredients: "Greens, Potato, Beef, Red chili pepper, Garlic",
+        related_image: "/images/menu/hamli-siga.jpg"
+      },
+      {
+        food_name: "Bamya Dinish",
+        price: 15.99,
+        ingredients: "Potato, Onion, Red chili pepper, Garlic",
+        related_image: "/images/menu/bamya.jpg"
       }
     ];
     

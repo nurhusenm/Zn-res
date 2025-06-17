@@ -17,23 +17,18 @@ export async function GET() {
   }
 }
 
-export async function POST() {
+export async function POST(req: Request) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user || session.user.role !== 'admin') {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  
   try {
-    // Add a test menu item
-    const testItem = await createMenuItem({
-      food_name: "Test Pasta",
-      price: 15.99,
-      ingredients: "Test ingredients",
-      related_image: "/images/menu/test.jpg"
-    });
-    
-    return NextResponse.json({
-      success: true,
-      message: 'Test item added',
-      item: testItem
-    });
+    const data = await req.json();
+    const item = await createMenuItem(data);
+    return NextResponse.json(item);
   } catch (error) {
-    console.error('Error adding test item:', error);
-    return NextResponse.json({ error: 'Failed to add test item' }, { status: 500 });
+    console.error('Error creating menu item:', error);
+    return NextResponse.json({ error: 'Failed to create menu item' }, { status: 500 });
   }
 }
