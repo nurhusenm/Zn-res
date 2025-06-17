@@ -7,7 +7,7 @@ import './globals.css';
 import Footer from "../../components/Footer";
 import Navbar from "../../components/Navbar.js";
 import { getServerSession } from 'next-auth';
-import { authOptions } from './api/auth/[...nextauth]/route';
+import { authOptions } from '../../lib/auth/options';
 import Providers from './providers';
 import { Toaster } from 'react-hot-toast';
 import ClientBody from "../../components/ClientBody";
