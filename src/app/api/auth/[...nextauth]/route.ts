@@ -1,9 +1,10 @@
 import NextAuth from "next-auth";
 import type { AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { getUserByEmail, verifyPassword } from"../../../../../lib/db/schema";
+import { getUserByEmail, verifyPassword } from "../../../../../lib/db/schema";
 
-export const authOptions: AuthOptions = {
+// Define locally (don't export)
+const authOptions: AuthOptions = {
   providers: [
     CredentialsProvider({
       id: "credentials",
@@ -13,10 +14,7 @@ export const authOptions: AuthOptions = {
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        console.log('Attempting to authorize with email:', credentials?.email);
-        
         if (!credentials?.email || !credentials?.password) {
-          console.log('Missing credentials');
           throw new Error("Email and password required");
         }
 
@@ -25,23 +23,10 @@ export const authOptions: AuthOptions = {
           credentials.password
         );
 
-        console.log('User found:', user ? 'Yes' : 'No');
-        if (user) {
-          console.log('User role:', user.role);
-        }
-
-        if (!user) {
-          console.log('Invalid credentials');
-          throw new Error("Invalid email or password");
-        }
-
-        // Only allow admin users to log in
-        if (user.role !== 'admin') {
-          console.log('Access denied - not admin');
+        if (!user || user.role !== 'admin') {
           throw new Error("Access denied. Admin access required.");
         }
 
-        console.log('Authentication successful');
         return {
           id: user.id.toString(),
           email: user.email,
@@ -57,7 +42,7 @@ export const authOptions: AuthOptions = {
   },
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days
+    maxAge: 30 * 24 * 60 * 60,
   },
   callbacks: {
     async jwt({ token, user }) {
@@ -77,5 +62,6 @@ export const authOptions: AuthOptions = {
   }
 };
 
+// Only export the handlers
 const handler = NextAuth(authOptions);
-export { handler as GET, handler as POST }; 
+export { handler as GET, handler as POST };
