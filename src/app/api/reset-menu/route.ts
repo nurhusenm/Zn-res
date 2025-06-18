@@ -1,21 +1,20 @@
 import { NextResponse } from 'next/server';
-import { createUser, createMenuItem } from '../../../../lib/db/schema';
+import { createMenuItem } from '../../../../lib/db/schema';
+import clientPromise from '../../../../lib/mongodb';
 
 export async function GET() {
   try {
-    console.log('🔧 Adding test data...');
+    console.log('🔄 Resetting menu with new items...');
     
-    // Create admin user
-    const adminUser = await createUser({
-      email: 'admin@zara.com',
-      password: 'admin123',
-      name: 'Admin User',
-      role: 'admin'
-    });
+    const client = await clientPromise;
+    const db = client.db('zara-restaurant');
+    const collection = db.collection('menu_items');
     
-    console.log('✅ Admin user created:', adminUser.email);
+    // Clear existing menu items
+    await collection.deleteMany({});
+    console.log('✅ Cleared existing menu items');
     
-    // Add menu items
+    // Add new menu items
     const menuItems = [
       {
         food_name: "Spaghetti or Macaroni (meat)",
@@ -208,16 +207,13 @@ export async function GET() {
     
     return NextResponse.json({
       success: true,
-      adminUser: {
-        email: adminUser.email,
-        password: 'admin123'
-      },
+      message: 'Menu reset successfully with new items',
       menuItems: createdItems.length,
       items: createdItems
     });
     
   } catch (error) {
-    console.error('❌ Error adding data:', error);
+    console.error('❌ Error resetting menu:', error);
     return NextResponse.json({
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error'

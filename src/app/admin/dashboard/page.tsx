@@ -84,12 +84,62 @@ export default function AdminDashboard() {
     if (!confirm('Are you sure you want to delete this item?')) return;
 
     try {
-      await deleteMenuItem(id);
+      toast.loading('Deleting menu item...');
+      
+      const response = await fetch(`/api/menu/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to delete item');
+      }
+      
+      toast.dismiss();
       toast.success('Menu item deleted successfully');
       fetchMenuItems();
     } catch (error) {
-      toast.error('Failed to delete menu item');
+      toast.dismiss();
+      toast.error(error instanceof Error ? error.message : 'Failed to delete menu item');
       console.error('Error deleting menu item:', error);
+    }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, isEditing: boolean = false) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      toast.loading('Uploading image...');
+      
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Upload failed');
+      }
+
+      const data = await response.json();
+      const imageUrl = data.url;
+
+      if (isEditing && editingItem) {
+        setEditingItem({ ...editingItem, related_image: imageUrl });
+      } else {
+        setNewItem({ ...newItem, related_image: imageUrl });
+      }
+      
+      toast.dismiss();
+      toast.success('Image uploaded successfully!');
+    } catch (error) {
+      toast.dismiss();
+      toast.error(error instanceof Error ? error.message : 'Failed to upload image');
+      console.error('Error uploading image:', error);
     }
   };
 
@@ -98,20 +148,32 @@ export default function AdminDashboard() {
     if (!editingItem) return;
 
     try {
+      toast.loading('Updating menu item...');
+      
       const response = await fetch(`/api/menu/${editingItem._id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(editingItem),
+        body: JSON.stringify({
+          food_name: editingItem.food_name,
+          price: editingItem.price,
+          ingredients: editingItem.ingredients,
+          related_image: editingItem.related_image
+        }),
       });
 
-      if (!response.ok) throw new Error('Failed to update item');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to update item');
+      }
       
+      toast.dismiss();
       toast.success('Menu item updated successfully');
       setIsEditing(false);
       setEditingItem(null);
       fetchMenuItems();
     } catch (error) {
-      toast.error('Failed to update menu item');
+      toast.dismiss();
+      toast.error(error instanceof Error ? error.message : 'Failed to update menu item');
       console.error('Error updating menu item:', error);
     }
   };
@@ -120,14 +182,20 @@ export default function AdminDashboard() {
     e.preventDefault();
 
     try {
+      toast.loading('Adding menu item...');
+      
       const response = await fetch('/api/menu', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newItem),
       });
 
-      if (!response.ok) throw new Error('Failed to add item');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to add item');
+      }
       
+      toast.dismiss();
       toast.success('Menu item added successfully');
       setIsAdding(false);
       setNewItem({
@@ -138,37 +206,9 @@ export default function AdminDashboard() {
       });
       fetchMenuItems();
     } catch (error) {
-      toast.error('Failed to add menu item');
+      toast.dismiss();
+      toast.error(error instanceof Error ? error.message : 'Failed to add menu item');
       console.error('Error adding menu item:', error);
-    }
-  };
-
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, isEditing: boolean = false) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const response = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) throw new Error('Upload failed');
-
-      const data = await response.json();
-      const imageUrl = data.url;
-
-      if (isEditing && editingItem) {
-        setEditingItem({ ...editingItem, related_image: imageUrl });
-      } else {
-        setNewItem({ ...newItem, related_image: imageUrl });
-      }
-    } catch (error) {
-      toast.error('Failed to upload image');
-      console.error('Error uploading image:', error);
     }
   };
 

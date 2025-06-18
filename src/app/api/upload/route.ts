@@ -23,12 +23,22 @@ export async function POST(request: Request) {
       );
     }
 
+    // Validate file size (max 5MB)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      return NextResponse.json(
+        { error: 'File size too large. Maximum size is 5MB.' },
+        { status: 400 }
+      );
+    }
+
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Create a unique filename
+    // Create a unique filename with original extension
+    const fileExtension = file.name.split('.').pop();
     const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
-    const filename = `${uniqueSuffix}-${file.name}`;
+    const filename = `${uniqueSuffix}.${fileExtension}`;
     
     // Ensure uploads directory exists
     const publicDir = join(process.cwd(), 'public', 'uploads');
@@ -42,11 +52,18 @@ export async function POST(request: Request) {
     // Return the URL path
     const url = `/uploads/${filename}`;
     
-    return NextResponse.json({ url });
+    console.log('✅ File uploaded successfully:', url);
+    
+    return NextResponse.json({ 
+      url,
+      filename,
+      size: file.size,
+      type: file.type
+    });
   } catch (error) {
-    console.error('Error uploading file:', error);
+    console.error('❌ Error uploading file:', error);
     return NextResponse.json(
-      { error: 'Error uploading file' },
+      { error: 'Error uploading file. Please try again.' },
       { status: 500 }
     );
   }
