@@ -7,7 +7,7 @@ export async function GET() {
     console.log('🔄 Resetting menu with new items...');
     
     const client = await clientPromise;
-    const db = client.db('zara-restaurant');
+    const db = client.db('xara-restuarant');
     const collection = db.collection('menu_items');
     
     // Clear existing menu items

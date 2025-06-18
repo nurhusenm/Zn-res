@@ -35,31 +35,74 @@ export async function POST(request: Request) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Create a unique filename with original extension
-    const fileExtension = file.name.split('.').pop();
-    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
-    const filename = `${uniqueSuffix}.${fileExtension}`;
+    // Check if we're in development or production
+    const isDevelopment = process.env.NODE_ENV === 'development';
     
-    // Ensure uploads directory exists
-    const publicDir = join(process.cwd(), 'public', 'uploads');
-    if (!existsSync(publicDir)) {
-      await mkdir(publicDir, { recursive: true });
+    if (isDevelopment) {
+      // Development: Save to local file system
+      try {
+        // Create a unique filename with original extension
+        const fileExtension = file.name.split('.').pop();
+        const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
+        const filename = `${uniqueSuffix}.${fileExtension}`;
+        
+        // Ensure uploads directory exists
+        const publicDir = join(process.cwd(), 'public', 'uploads');
+        if (!existsSync(publicDir)) {
+          await mkdir(publicDir, { recursive: true });
+        }
+        
+        const path = join(publicDir, filename);
+        await writeFile(path, buffer);
+        
+        // Return the URL path
+        const url = `/uploads/${filename}`;
+        
+        console.log('✅ File uploaded successfully (development):', url);
+        
+        return NextResponse.json({ 
+          url,
+          filename,
+          size: file.size,
+          type: file.type
+        });
+      } catch (fsError) {
+        console.error('❌ File system error:', fsError);
+        // Fall through to base64 conversion
+      }
     }
-    
-    const path = join(publicDir, filename);
-    await writeFile(path, buffer);
-    
-    // Return the URL path
-    const url = `/uploads/${filename}`;
-    
-    console.log('✅ File uploaded successfully:', url);
-    
-    return NextResponse.json({ 
-      url,
-      filename,
-      size: file.size,
-      type: file.type
-    });
+
+    // Production (Vercel) or fallback: Convert to base64 data URL
+    try {
+      const base64 = Buffer.from(buffer).toString('base64');
+      const dataUrl = `data:${file.type};base64,${base64}`;
+      
+      console.log('✅ File converted to base64 (production):', file.name);
+      
+      return NextResponse.json({ 
+        url: dataUrl,
+        filename: file.name,
+        size: file.size,
+        type: file.type,
+        isBase64: true
+      });
+    } catch (base64Error) {
+      console.error('❌ Base64 conversion error:', base64Error);
+      
+      // Final fallback: Return a placeholder image
+      const placeholderUrl = `https://via.placeholder.com/400x300/cccccc/666666?text=${encodeURIComponent(file.name)}`;
+      
+      console.log('✅ Using placeholder image as fallback:', placeholderUrl);
+      
+      return NextResponse.json({ 
+        url: placeholderUrl,
+        filename: file.name,
+        size: file.size,
+        type: file.type,
+        isPlaceholder: true
+      });
+    }
+
   } catch (error) {
     console.error('❌ Error uploading file:', error);
     return NextResponse.json(

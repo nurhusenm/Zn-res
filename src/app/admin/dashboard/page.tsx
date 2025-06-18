@@ -120,12 +120,12 @@ export default function AdminDashboard() {
         body: formData,
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Upload failed');
+        throw new Error(data.error || 'Upload failed');
       }
 
-      const data = await response.json();
       const imageUrl = data.url;
 
       if (isEditing && editingItem) {
@@ -138,7 +138,8 @@ export default function AdminDashboard() {
       toast.success('Image uploaded successfully!');
     } catch (error) {
       toast.dismiss();
-      toast.error(error instanceof Error ? error.message : 'Failed to upload image');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to upload image';
+      toast.error(errorMessage);
       console.error('Error uploading image:', error);
     }
   };
@@ -447,6 +448,9 @@ export default function AdminDashboard() {
                             className="flex-1 px-3 py-2 border border-[#b8805a] rounded-md focus:outline-none focus:ring-2 focus:ring-[#b5633e] bg-white text-[#452614] placeholder-gray-400"
                           />
                         </div>
+                        <p className="text-xs text-gray-500">
+                          💡 Tip: You can upload an image or paste an image URL. For best results, use URLs from image hosting services.
+                        </p>
                       </div>
                     </div>
                   </form>
@@ -575,6 +579,9 @@ export default function AdminDashboard() {
                             className="flex-1 px-3 py-2 border border-[#b8805a] rounded-md focus:outline-none focus:ring-2 focus:ring-[#b5633e] bg-white text-[#452614] placeholder-gray-400"
                           />
                         </div>
+                        <p className="text-xs text-gray-500">
+                          💡 Tip: You can upload an image or paste an image URL. For best results, use URLs from image hosting services.
+                        </p>
                       </div>
                     </div>
                   </form>
